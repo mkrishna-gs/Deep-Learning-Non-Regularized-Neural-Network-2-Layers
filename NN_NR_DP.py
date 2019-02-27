@@ -14,7 +14,7 @@ from sklearn.metrics import confusion_matrix
 import itertools
 
 np.set_printoptions(threshold=np.inf)
-
+### Confusion matrix to see the difference between the predicted and the actual set
 def plotCf(a,b,t):
     cf =confusion_matrix(a,b)
     plt.imshow(cf,cmap=plt.cm.Blues,interpolation='nearest')
@@ -30,13 +30,13 @@ def plotCf(a,b,t):
     for i,j in itertools.product(range(cf.shape[0]),range(cf.shape[1])):
         plt.text(j,i,format(cf[i,j],'d'),horizontalalignment='center',color='white' if cf[i,j] >thresh else 'black')
     plt.show();
-
+### Activation functions
 def Sigmoid(Z):
     return 1/(1+np.exp(-Z))
     
 def Relu(Z):
     return np.maximum(0,Z)
-
+### Activation functions derivatives
 def dRelu(x):
     x[x<=0] = 0
     x[x>0] = 1
@@ -60,7 +60,7 @@ class dlnet:
         self.loss = []
         self.lr=0.003
         self.sam = self.Y.shape[1]
-        
+    ### Intionalize the paramaters randomly    
     def nInit(self):    
         np.random.seed(1)
         self.param['W1'] = np.random.randn(self.dims[1], self.dims[0]) / np.sqrt(self.dims[0]) 
@@ -68,7 +68,7 @@ class dlnet:
         self.param['W2'] = np.random.randn(self.dims[2], self.dims[1]) / np.sqrt(self.dims[1]) 
         self.param['b2'] = np.zeros((self.dims[2], 1))                
         return
-    
+    ### Forward Propagation
     def forward(self):    
         Z1 = self.param['W1'].dot(self.X) + self.param['b1'] 
         A1 = Relu(Z1)
@@ -79,11 +79,11 @@ class dlnet:
         self.Yh=A2
         loss=self.nloss(A2)
         return self.Yh, loss
-    
+    ### Loss function
     def nloss(self,Yh):
         loss = (1./self.sam) * (-np.dot(self.Y,np.log(Yh).T) - np.dot(1-self.Y, np.log(1-Yh).T))    
         return loss
-    
+    ### Backward propagation
     def backward(self):
         dLoss_Yh = - (np.divide(self.Y, self.Yh ) - np.divide(1 - self.Y, 1 - self.Yh))    
         dLoss_Z2 = dLoss_Yh * dSigmoid(self.ch['Z2'])    
@@ -99,7 +99,7 @@ class dlnet:
         self.param["W2"] = self.param["W2"] - self.lr * dLoss_W2
         self.param["b2"] = self.param["b2"] - self.lr * dLoss_b2
         return
-
+    ### Prdictions
     def pred(self,x, y):  
         self.X=x
         self.Y=y
@@ -112,7 +112,7 @@ class dlnet:
     
         print("Acc: " + str(np.sum((comp == y)/x.shape[1])))        
         return comp
-    
+    ### Gradient descent
     def gd(self,X, Y, iter = 3000):
         np.random.seed(1)                             
         self.nInit()
